@@ -22,9 +22,23 @@
                         mono: ['Inter', 'monospace'],
                     },
                     colors: {
-                        'chem-dark': '#0B1120',
-                        'chem-panel': '#151E32',
+                        'chem-bg': '#050B14',
+                        'chem-panel': '#0F172A',
                         'chem-card': '#1E293B',
+                        'chem-neon-blue': '#38BDF8',
+                        'chem-neon-green': '#34D399',
+                        'chem-neon-purple': '#A78BFA',
+                    },
+                    animation: {
+                        'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'pop': 'pop 0.3s ease-out forwards',
+                    },
+                    keyframes: {
+                        pop: {
+                            '0%': { transform: 'scale(0.95)', opacity: '0.5' },
+                            '50%': { transform: 'scale(1.05)' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        }
                     }
                 }
             }
@@ -33,7 +47,7 @@
     <style>
         body { 
             font-family: 'Sarabun', 'Inter', sans-serif;
-            background-color: #0B1120;
+            background-color: #050B14;
             margin: 0;
             padding: 0;
             display: flex;
@@ -42,7 +56,7 @@
             height: 100vh;
             width: 100vw;
             overflow: hidden;
-            touch-action: manipulation; /* Prevent double-tap zoom on mobile */
+            touch-action: manipulation;
         }
 
         /* Remove default number input spinners */
@@ -52,17 +66,14 @@
             margin: 0; 
         }
         
-        /* 
-           The App Container: 
-           It attempts to maintain a 16:9 ratio where possible, but flexibly 
-           adapts to fill available space gracefully on mobile/tablets.
-        */
+        /* 16:9 App Container constraints */
         #app-container {
             width: 100%;
             height: 100%;
             display: flex;
             flex-direction: column;
-            background: radial-gradient(circle at top right, #1a2744 0%, #0B1120 70%);
+            background: radial-gradient(circle at center, #0F172A 0%, #050B14 100%);
+            position: relative;
         }
 
         @media (min-aspect-ratio: 16/9) {
@@ -71,114 +82,120 @@
                 margin: 0 auto;
                 border-left: 1px solid #1E293B;
                 border-right: 1px solid #1E293B;
-                box-shadow: 0 0 50px rgba(0,0,0,0.5);
+                box-shadow: 0 0 80px rgba(0,0,0,0.8);
             }
         }
 
-        /* Scrollbar hiding for clean UI */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
+        /* Scrollbar hiding */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* Glass effect utilities */
+        /* Premium Glass Panel */
         .glass-panel {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        /* Interactive Element Sizing for Touch (Pro View) */
-        .touch-btn {
-            min-height: 44px;
-            min-width: 44px;
+        /* Custom Range/Progress Bar */
+        .balance-bar {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Grid Background pattern for the lab feel */
+        .bg-grid-pattern {
+            background-image: 
+                linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
         }
     </style>
 </head>
 <body class="text-slate-100">
 
-    <div id="app-container" class="relative">
+    <div id="app-container">
+        
+        <!-- Background Grid Decoration -->
+        <div class="absolute inset-0 bg-grid-pattern pointer-events-none opacity-50 z-0"></div>
         
         <!-- Header -->
-        <header class="glass-panel px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between z-10 shadow-lg">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/30">
-                    <i class="fa-solid fa-flask-vial text-slate-900 text-xl sm:text-2xl font-black"></i>
+        <header class="glass-panel px-4 sm:px-8 py-3 sm:py-4 flex items-center justify-between z-10">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-chem-neon-blue to-blue-700 flex items-center justify-center shadow-[0_0_20px_rgba(56,189,248,0.4)]">
+                    <i class="fa-solid fa-flask-vial text-slate-900 text-2xl font-black"></i>
                 </div>
                 <div>
-                    <h1 class="font-black text-lg sm:text-2xl tracking-tight text-white leading-none">ChemLab Pro</h1>
-                    <span class="text-cyan-400 text-xs sm:text-sm font-bold opacity-80">ห้องทดลองดุลสมการเคมี ม.3</span>
+                    <h1 class="font-black text-xl sm:text-3xl tracking-tight text-white leading-none drop-shadow-md">ChemLab <span class="text-chem-neon-blue">Pro</span></h1>
+                    <span class="text-slate-400 text-sm font-bold tracking-wide">ห้องทดลองดุลสมการ ม.3</span>
                 </div>
             </div>
             
-            <button onclick="openGuideModal()" class="touch-btn px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-cyan-300 text-sm sm:text-base font-bold transition-all border border-cyan-500/30 shadow-sm flex items-center gap-2">
-                <i class="fa-solid fa-book-open"></i>
-                <span class="hidden sm:inline">วิธีการดุลสมการ</span>
+            <button onclick="openGuideModal()" class="px-5 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-chem-neon-blue text-sm sm:text-base font-bold transition-all border border-chem-neon-blue/30 shadow-lg hover:shadow-chem-neon-blue/20 flex items-center gap-2">
+                <i class="fa-solid fa-lightbulb"></i>
+                <span class="hidden sm:inline">วิธีใช้และหลักการ</span>
                 <span class="sm:hidden">วิธีใช้</span>
             </button>
         </header>
 
-        <!-- Main Workspace -->
-        <main class="flex-1 flex flex-col p-2 sm:p-4 md:p-6 gap-2 sm:gap-4 md:gap-6 overflow-hidden">
+        <main class="flex-1 flex flex-col p-3 sm:p-6 lg:p-8 gap-4 sm:gap-6 z-10 overflow-hidden">
 
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shrink-0">
-                <div class="relative w-full sm:w-auto flex-1 max-w-2xl">
-                    <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-cyan-400">
-                        <i class="fa-solid fa-list-ol"></i>
+            <!-- Top Control Bar -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 shrink-0">
+                <!-- Dropdown Selector -->
+                <div class="relative w-full sm:w-auto flex-1 max-w-3xl">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none text-chem-neon-blue">
+                        <i class="fa-solid fa-flask"></i>
                     </div>
-                    <select id="preset-selector" onchange="onPresetChange(this.value)" class="w-full appearance-none bg-chem-panel border-2 border-slate-700 hover:border-cyan-500/50 text-slate-100 text-base sm:text-lg lg:text-xl font-bold rounded-2xl pl-12 pr-10 py-3 sm:py-4 outline-none focus:border-cyan-400 shadow-lg cursor-pointer transition-colors truncate">
+                    <select id="preset-selector" onchange="onPresetChange(this.value)" class="w-full appearance-none bg-chem-panel/90 backdrop-blur-md border-2 border-slate-700 hover:border-chem-neon-blue/50 text-white text-lg sm:text-xl font-black rounded-2xl pl-14 pr-12 py-3 sm:py-4 outline-none focus:border-chem-neon-blue shadow-xl cursor-pointer transition-all truncate">
                         <!-- Options injected by JS -->
                     </select>
-                    <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-400">
-                        <i class="fa-solid fa-chevron-down"></i>
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400">
+                        <i class="fa-solid fa-caret-down text-xl"></i>
                     </div>
                 </div>
                 
-                <div class="flex items-center gap-2 sm:gap-3">
-                    <button onclick="checkEquationBalance()" class="touch-btn flex-1 sm:flex-none px-6 py-3 sm:py-4 bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-slate-950 font-black text-base sm:text-lg lg:text-xl rounded-2xl shadow-lg shadow-cyan-500/25 transition-all flex items-center justify-center gap-2 transform hover:scale-105 active:scale-95">
-                        <i class="fa-solid fa-check-double"></i>
+                <!-- Action Buttons -->
+                <div class="flex items-center gap-3">
+                    <button onclick="checkEquationBalance()" class="flex-1 sm:flex-none px-8 py-3 sm:py-4 bg-gradient-to-r from-chem-neon-blue to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white font-black text-lg sm:text-xl rounded-2xl shadow-[0_0_25px_rgba(56,189,248,0.3)] transition-all flex items-center justify-center gap-3 transform hover:scale-105 active:scale-95 border border-blue-400/50">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
                         <span>ตรวจสอบ</span>
                     </button>
-                    <button onclick="resetSimulator()" class="touch-btn px-4 py-3 sm:py-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-lg sm:text-xl transition-colors border border-slate-600 shadow-lg flex items-center justify-center" title="เริ่มใหม่">
+                    <button onclick="resetSimulator()" class="px-5 py-3 sm:py-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xl transition-all border border-slate-600 shadow-lg hover:text-white" title="เริ่มใหม่">
                         <i class="fa-solid fa-rotate-right"></i>
                     </button>
                 </div>
             </div>
 
-            <div class="flex-1 min-h-[30%] sm:min-h-[40%] bg-chem-panel rounded-3xl border border-slate-700 shadow-2xl shadow-black/50 flex flex-col overflow-hidden relative">
+            <div class="flex-1 flex flex-col min-h-0 bg-chem-panel/80 backdrop-blur-xl rounded-[2rem] border border-slate-700/80 shadow-2xl overflow-hidden relative">
                 
-                <!-- The Equation Builder (Horizontal Scroller for mobile) -->
-                <div id="equation-builder-container" class="flex-1 flex flex-row items-center justify-start md:justify-center gap-2 sm:gap-4 p-4 sm:p-6 overflow-x-auto no-scrollbar w-full">
-                    <!-- Dynamic Equation Elements -->
+                <!-- 1. The Equation Builder (Top Half) -->
+                <div id="equation-builder-container" class="flex-none flex flex-row items-center justify-start md:justify-center gap-3 sm:gap-5 p-6 sm:p-8 overflow-x-auto no-scrollbar w-full min-h-[45%]">
+                    <!-- Dynamic Equation Elements go here -->
                 </div>
 
-                <!-- Subtle divider -->
-                <div class="h-px w-full bg-gradient-to-r from-transparent via-slate-600 to-transparent opacity-50"></div>
+                <!-- Divider -->
+                <div class="h-px w-full bg-gradient-to-r from-transparent via-slate-600 to-transparent opacity-60"></div>
 
-                <div class="h-[45%] sm:h-[40%] flex flex-row divide-x divide-slate-700/50 bg-chem-dark/50">
+                <!-- 2. The Unified Atom Balance Tracker (Bottom Half) -->
+                <div class="flex-1 flex flex-col p-4 sm:p-6 bg-slate-900/50 overflow-hidden">
                     
-                    <!-- Reactants -->
-                    <div class="flex-1 flex flex-col p-2 sm:p-4 overflow-hidden">
-                        <h3 class="text-xs sm:text-sm lg:text-base font-black text-indigo-400 uppercase tracking-widest text-center mb-2 sm:mb-3 shrink-0 drop-shadow-md">
-                            สารตั้งต้น (ซ้าย)
-                        </h3>
-                        <div id="reactant-atoms-visual" class="flex-1 overflow-y-auto no-scrollbar flex flex-col gap-1.5 sm:gap-2">
-                            <!-- Dynamic Reactant Atoms -->
+                    <!-- Table Headers -->
+                    <div class="grid grid-cols-3 items-center mb-4 shrink-0 px-4">
+                        <div class="text-left font-black text-chem-neon-purple uppercase tracking-widest text-sm sm:text-base drop-shadow-md flex items-center gap-2">
+                            <i class="fa-solid fa-arrow-right-to-bracket opacity-70"></i> สารตั้งต้น (ซ้าย)
+                        </div>
+                        <div class="text-center font-black text-slate-400 uppercase tracking-widest text-sm sm:text-base">
+                            ธาตุ
+                        </div>
+                        <div class="text-right font-black text-chem-neon-green uppercase tracking-widest text-sm sm:text-base drop-shadow-md flex items-center justify-end gap-2">
+                            ผลิตภัณฑ์ (ขวา) <i class="fa-solid fa-arrow-right-from-bracket opacity-70"></i>
                         </div>
                     </div>
 
-                    <!-- Products -->
-                    <div class="flex-1 flex flex-col p-2 sm:p-4 overflow-hidden">
-                        <h3 class="text-xs sm:text-sm lg:text-base font-black text-emerald-400 uppercase tracking-widest text-center mb-2 sm:mb-3 shrink-0 drop-shadow-md">
-                            ผลิตภัณฑ์ (ขวา)
-                        </h3>
-                        <div id="product-atoms-visual" class="flex-1 overflow-y-auto no-scrollbar flex flex-col gap-1.5 sm:gap-2">
-                            <!-- Dynamic Product Atoms -->
-                        </div>
+                    <!-- Dynamic Comparison Rows -->
+                    <div id="unified-atom-visual" class="flex-1 overflow-y-auto no-scrollbar flex flex-col gap-3 pb-4">
+                        <!-- Rows injected by JS -->
                     </div>
 
                 </div>
@@ -187,44 +204,56 @@
         </main>
     </div>
 
-    <div id="guide-modal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-chem-panel border border-slate-700 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative">
-            <button onclick="closeGuideModal()" class="absolute top-5 right-5 w-10 h-10 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-lg transition-all">
+    <div id="guide-modal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-chem-panel border border-slate-700 rounded-[2rem] max-w-xl w-full p-6 sm:p-10 shadow-2xl relative transform transition-all">
+            <button onclick="closeGuideModal()" class="absolute top-6 right-6 w-12 h-12 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-xl transition-all shadow-inner border border-slate-600/50 hover:text-white">
                 <i class="fa-solid fa-xmark"></i>
             </button>
             
-            <div class="flex items-center gap-4 border-b border-slate-700 pb-4 mb-4">
-                <div class="w-12 h-12 rounded-2xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-xl font-bold">
-                    <i class="fa-solid fa-book-open"></i>
+            <div class="flex items-center gap-5 border-b border-slate-700/80 pb-6 mb-6">
+                <div class="w-16 h-16 rounded-2xl bg-chem-neon-blue/20 text-chem-neon-blue flex items-center justify-center text-3xl font-black shadow-inner">
+                    <i class="fa-solid fa-book-journal-whills"></i>
                 </div>
                 <div>
-                    <h3 class="text-xl sm:text-2xl font-black text-white">วิธีดุลสมการเคมี</h3>
-                    <p class="text-sm text-cyan-400 font-medium">หลักการง่ายๆ สำหรับ ม.3</p>
+                    <h3 class="text-2xl sm:text-3xl font-black text-white tracking-tight">เทคนิคการดุลสมการ</h3>
+                    <p class="text-base text-chem-neon-blue font-medium mt-1">คู่มือฉบับ Pro สำหรับ ม.3</p>
                 </div>
             </div>
 
             <div class="space-y-4 text-slate-200">
-                <div class="bg-slate-900/80 p-4 rounded-2xl border border-slate-700">
-                    <h4 class="font-black text-base sm:text-lg text-indigo-300 flex items-center gap-2 mb-1">
-                        <i class="fa-solid fa-scale-balanced"></i> กฎทรงมวล
+                <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-700/80 shadow-inner">
+                    <h4 class="font-black text-lg text-chem-neon-purple flex items-center gap-3 mb-2">
+                        <div class="w-8 h-8 rounded-lg bg-chem-neon-purple/20 flex items-center justify-center text-sm"><i class="fa-solid fa-scale-balanced"></i></div>
+                        1. กฎทรงมวล (Law of Conservation of Mass)
                     </h4>
-                    <p class="text-sm sm:text-base text-slate-400 leading-relaxed">
-                        จำนวนอะตอมของธาตุแต่ละชนิดในฝั่ง <b>สารตั้งต้น (ซ้าย)</b> ต้องเท่ากับฝั่ง <b>ผลิตภัณฑ์ (ขวา)</b> ทุกประการ
+                    <p class="text-base text-slate-400 leading-relaxed pl-11">
+                        จำนวนอะตอมของธาตุแต่ละชนิดฝั่ง <b>ซ้าย (สารตั้งต้น)</b> ต้องเท่ากับฝั่ง <b>ขวา (ผลิตภัณฑ์)</b> อย่างสมบูรณ์ หายไปหรือเพิ่มขึ้นไม่ได้
                     </p>
                 </div>
 
-                <div class="bg-slate-900/80 p-4 rounded-2xl border border-slate-700">
-                    <h4 class="font-black text-base sm:text-lg text-emerald-300 flex items-center gap-2 mb-1">
-                        <i class="fa-solid fa-pen-nib"></i> ห้ามเปลี่ยนตัวห้อย
+                <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-700/80 shadow-inner">
+                    <h4 class="font-black text-lg text-rose-400 flex items-center gap-3 mb-2">
+                        <div class="w-8 h-8 rounded-lg bg-rose-500/20 flex items-center justify-center text-sm"><i class="fa-solid fa-lock"></i></div>
+                        2. ห้ามเปลี่ยนสูตรเคมีเด็ดขาด!
                     </h4>
-                    <p class="text-sm sm:text-base text-slate-400 leading-relaxed">
-                        ห้ามแก้สูตรเคมี (เช่น เปลี่ยน H₂O เป็น H₂O₂) <b>ให้เติมหรือปรับเฉพาะ "ตัวเลขสัมประสิทธิ์"</b> ที่อยู่ด้านหน้าโมเลกุลเท่านั้น
+                    <p class="text-base text-slate-400 leading-relaxed pl-11">
+                        ห้ามเปลี่ยนตัวห้อย (เช่น ห้ามแก้ H₂O เป็น H₂O₂) <b>ให้เติมหรือปรับเฉพาะ "ตัวเลขสัมประสิทธิ์" ด้านหน้าโมเลกุลเท่านั้น</b>
+                    </p>
+                </div>
+                
+                <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-700/80 shadow-inner">
+                    <h4 class="font-black text-lg text-chem-neon-green flex items-center gap-3 mb-2">
+                        <div class="w-8 h-8 rounded-lg bg-chem-neon-green/20 flex items-center justify-center text-sm"><i class="fa-solid fa-divide"></i></div>
+                        3. อัตราส่วนอย่างต่ำ
+                    </h4>
+                    <p class="text-base text-slate-400 leading-relaxed pl-11">
+                        สมการที่ดุลเสร็จสมบูรณ์ ตัวเลขสัมประสิทธิ์ทั้งหมดจะต้องทอนเป็นอัตราส่วนอย่างต่ำได้
                     </p>
                 </div>
             </div>
 
-            <button onclick="closeGuideModal()" class="w-full mt-6 py-4 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-lg transition-all shadow-lg">
-                เข้าใจแล้ว, เริ่มลุย!
+            <button onclick="closeGuideModal()" class="w-full mt-8 py-4 rounded-2xl bg-gradient-to-r from-chem-neon-blue to-blue-500 hover:from-blue-400 hover:to-blue-600 text-white font-black text-xl transition-all shadow-[0_0_20px_rgba(56,189,248,0.3)] border border-blue-400/50">
+                พร้อมลุยแล้ว!
             </button>
         </div>
     </div>
@@ -250,7 +279,7 @@
             { name: "16. ซิลเวอร์ไนเตรต: AgNO₃ + Cu → Cu(NO₃)₂ + Ag", reactants: [{ formula: "AgNO₃", elements: { Ag: 1, N: 1, O: 3 } }, { formula: "Cu", elements: { Cu: 1 } }], products: [{ formula: "Cu(NO₃)₂", elements: { Cu: 1, N: 2, O: 6 } }, { formula: "Ag", elements: { Ag: 1 } }], correctCoeffs: [2, 1, 1, 2] },
             { name: "17. การเผาไหม้เอทานอล: C₂H₅OH + O₂ → CO₂ + H₂O", reactants: [{ formula: "C₂H₅OH", elements: { C: 2, H: 6, O: 1 } }, { formula: "O₂", elements: { O: 2 } }], products: [{ formula: "CO₂", elements: { C: 1, O: 2 } }, { formula: "H₂O", elements: { H: 2, O: 1 } }], correctCoeffs: [1, 3, 2, 3] },
             { name: "18. อลูมิเนียมกับกรด: Al + HCl → AlCl₃ + H₂", reactants: [{ formula: "Al", elements: { Al: 1 } }, { formula: "HCl", elements: { H: 1, Cl: 1 } }], products: [{ formula: "AlCl₃", elements: { Al: 1, Cl: 3 } }, { formula: "H₂", elements: { H: 2 } }], correctCoeffs: [2, 6, 2, 3] },
-            { name: "19. เหล็กกับน้ำ (ไอน้ำ): Fe + H₂O → Fe₃O₄ + H₂", reactants: [{ formula: "Fe", elements: { Fe: 1 } }, { formula: "H₂O", elements: { H: 2, O: 1 } }], products: [{ formula: "Fe₃O₄", elements: { Fe: 3, O: 4 } }, { formula: "H₂", elements: { H: 2 } }], correctCoeffs: [3, 4, 1, 4] },
+            { name: "19. เหล็กกับไอน้ำ: Fe + H₂O → Fe₃O₄ + H₂", reactants: [{ formula: "Fe", elements: { Fe: 1 } }, { formula: "H₂O", elements: { H: 2, O: 1 } }], products: [{ formula: "Fe₃O₄", elements: { Fe: 3, O: 4 } }, { formula: "H₂", elements: { H: 2 } }], correctCoeffs: [3, 4, 1, 4] },
             { name: "20. ซัลเฟอร์ไดออกไซด์: S₈ + O₂ → SO₂", reactants: [{ formula: "S₈", elements: { S: 8 } }, { formula: "O₂", elements: { O: 2 } }], products: [{ formula: "SO₂", elements: { S: 1, O: 2 } }], correctCoeffs: [1, 8, 8] }
         ];
 
@@ -268,7 +297,11 @@
         }
 
         function openGuideModal() {
-            document.getElementById('guide-modal').classList.remove('hidden');
+            const modal = document.getElementById('guide-modal');
+            modal.classList.remove('hidden');
+            // Small pop animation
+            modal.children[0].classList.add('animate-pop');
+            setTimeout(() => modal.children[0].classList.remove('animate-pop'), 300);
         }
 
         function closeGuideModal() {
@@ -287,29 +320,38 @@
             let html = '';
             let coeffIdx = 0;
 
-            const buildTerm = (r, idx, isProduct, totalLength) => {
+            const buildTerm = (r, idx, isProduct) => {
                 let termHtml = '';
                 if (idx > 0) {
-                    termHtml += '<span class="text-3xl sm:text-4xl font-black text-slate-500 mx-1 sm:mx-3 shrink-0">+</span>';
+                    termHtml += '<span class="text-4xl sm:text-5xl font-black text-slate-600 mx-2 sm:mx-4 shrink-0 drop-shadow-md">+</span>';
                 }
                 
-                const colorTheme = isProduct ? 'emerald' : 'indigo';
+                const theme = isProduct ? 'chem-neon-green' : 'chem-neon-purple';
+                const bgTheme = isProduct ? 'bg-emerald-950/40' : 'bg-indigo-950/40';
+                const borderTheme = isProduct ? 'border-emerald-800/60' : 'border-indigo-800/60';
                 
                 termHtml += `
-                    <div class="flex flex-row items-stretch bg-chem-card border-2 border-slate-700/80 rounded-2xl shadow-xl shrink-0 overflow-hidden group">
+                    <div class="flex flex-row items-stretch ${bgTheme} border-2 ${borderTheme} rounded-3xl shadow-2xl shrink-0 overflow-hidden relative group transition-all hover:border-${theme}/60">
                         
-                        <!-- Stacked Coefficient Input -->
-                        <div class="flex flex-col border-r-2 border-slate-700/80 bg-slate-900/50 w-12 sm:w-16 lg:w-20">
-                            <button onclick="adjustCoeff(${coeffIdx}, 1)" class="flex-1 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-${colorTheme}-400 transition-colors cursor-pointer text-sm sm:text-base lg:text-xl"><i class="fa-solid fa-plus"></i></button>
+                        <!-- Glow Effect -->
+                        <div class="absolute inset-0 bg-gradient-to-r from-${theme}/0 via-${theme}/5 to-${theme}/0 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+
+                        <!-- Stacked Vertical Controls (Left Side) -->
+                        <div class="flex flex-col border-r-2 ${borderTheme} bg-slate-950/80 w-16 sm:w-20 lg:w-24 z-10">
+                            <button onclick="adjustCoeff(${coeffIdx}, 1)" class="flex-1 flex items-center justify-center bg-slate-800/80 hover:bg-slate-700 text-${theme} transition-colors cursor-pointer text-lg sm:text-xl lg:text-2xl active:bg-slate-600">
+                                <i class="fa-solid fa-chevron-up"></i>
+                            </button>
                             
-                            <input type="number" min="1" max="15" value="1" data-coeff="${coeffIdx}" onchange="updateSimulatorVisuals()" class="w-full text-center py-1 sm:py-2 bg-slate-950 text-${colorTheme}-400 font-black text-xl sm:text-2xl lg:text-3xl outline-none focus:bg-slate-900 border-y border-slate-700/50">
+                            <input type="number" min="1" max="15" value="1" id="coeff-input-${coeffIdx}" data-coeff="${coeffIdx}" onchange="updateSimulatorVisuals()" class="w-full text-center py-2 sm:py-3 bg-slate-950 text-${theme} font-black text-2xl sm:text-3xl lg:text-4xl outline-none focus:bg-slate-900 border-y ${borderTheme} shadow-inner transition-all">
                             
-                            <button onclick="adjustCoeff(${coeffIdx}, -1)" class="flex-1 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-${colorTheme}-400 transition-colors cursor-pointer text-sm sm:text-base lg:text-xl"><i class="fa-solid fa-minus"></i></button>
+                            <button onclick="adjustCoeff(${coeffIdx}, -1)" class="flex-1 flex items-center justify-center bg-slate-800/80 hover:bg-slate-700 text-${theme} transition-colors cursor-pointer text-lg sm:text-xl lg:text-2xl active:bg-slate-600">
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </button>
                         </div>
 
-                        <!-- Chemical Formula -->
-                        <div class="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex items-center justify-center bg-slate-800/20">
-                            <span class="font-mono text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-wider">${r.formula}</span>
+                        <!-- Formula Display (Right Side) -->
+                        <div class="px-6 sm:px-8 lg:px-10 py-6 sm:py-8 flex items-center justify-center z-10">
+                            <span class="font-mono text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-widest drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">${r.formula}</span>
                         </div>
                     </div>
                 `;
@@ -317,14 +359,17 @@
                 return termHtml;
             };
 
+            // Build Reactants
             eq.reactants.forEach((r, idx) => {
-                html += buildTerm(r, idx, false, eq.reactants.length);
+                html += buildTerm(r, idx, false);
             });
 
-            html += '<div class="mx-2 sm:mx-6 text-cyan-400 text-3xl sm:text-5xl font-black shrink-0"><i class="fa-solid fa-arrow-right"></i></div>';
+            // Arrow
+            html += '<div class="mx-4 sm:mx-8 text-chem-neon-blue text-4xl sm:text-6xl font-black shrink-0 drop-shadow-[0_0_15px_rgba(56,189,248,0.5)]"><i class="fa-solid fa-arrow-right-long"></i></div>';
 
+            // Build Products
             eq.products.forEach((p, idx) => {
-                html += buildTerm(p, idx, true, eq.products.length);
+                html += buildTerm(p, idx, true);
             });
 
             container.innerHTML = html;
@@ -332,11 +377,17 @@
         }
 
         function adjustCoeff(index, delta) {
-            const inputs = document.querySelectorAll('#equation-builder-container input');
-            if (inputs[index]) {
-                let val = parseInt(inputs[index].value) || 1;
-                val = Math.max(1, Math.min(15, val + delta)); // Increased max to 15 for harder equations
-                inputs[index].value = val;
+            const input = document.getElementById(`coeff-input-${index}`);
+            if (input) {
+                let val = parseInt(input.value) || 1;
+                val = Math.max(1, Math.min(15, val + delta));
+                input.value = val;
+                
+                // Add pop animation to input text
+                input.classList.remove('animate-pop');
+                void input.offsetWidth; // trigger reflow
+                input.classList.add('animate-pop');
+                
                 updateSimulatorVisuals();
             }
         }
@@ -353,52 +404,78 @@
             const coeffs = Array.from(inputs).map(inp => parseInt(inp.value) || 1);
 
             let reactantCounts = {};
+            let productCounts = {};
+            let allElements = new Set();
+
+            // Calculate Reactants
             eq.reactants.forEach((r, rIdx) => {
                 const c = coeffs[rIdx];
                 for (let el in r.elements) {
                     reactantCounts[el] = (reactantCounts[el] || 0) + (r.elements[el] * c);
+                    allElements.add(el);
                 }
             });
 
-            let productCounts = {};
+            // Calculate Products
             let pStartIdx = eq.reactants.length;
             eq.products.forEach((p, pIdx) => {
                 const c = coeffs[pStartIdx + pIdx];
                 for (let el in p.elements) {
                     productCounts[el] = (productCounts[el] || 0) + (p.elements[el] * c);
+                    allElements.add(el);
                 }
             });
 
-            const generateListHtml = (counts, compareCounts, themeColor) => {
-                let html = '';
-                for (let el in counts) {
-                    const count = counts[el];
-                    const compCount = compareCounts[el] || 0;
-                    const isMatch = count === compCount;
-                    
-                    const bgClass = isMatch ? `bg-${themeColor}-900/30 border-${themeColor}-500/50` : `bg-rose-900/20 border-rose-500/30`;
-                    const textClass = isMatch ? `text-${themeColor}-300` : `text-rose-300`;
-                    const icon = isMatch ? `<i class="fa-solid fa-check text-${themeColor}-400"></i>` : `<i class="fa-solid fa-exclamation text-rose-400"></i>`;
+            // Generate Unified Visual Rows
+            let html = '';
+            
+            // Find max count for relative bar width
+            let maxCount = 1;
+            allElements.forEach(el => {
+                if((reactantCounts[el] || 0) > maxCount) maxCount = reactantCounts[el];
+                if((productCounts[el] || 0) > maxCount) maxCount = productCounts[el];
+            });
 
-                    html += `
-                        <div class="flex items-center justify-between px-3 sm:px-4 py-2 sm:py-3 rounded-xl border ${bgClass} transition-all">
-                            <span class="font-bold text-slate-300 text-sm sm:text-base lg:text-lg">
-                                ${el}
-                            </span>
-                            <div class="flex items-center gap-3">
-                                <span class="font-mono font-black text-lg sm:text-xl lg:text-2xl ${textClass}">${count}</span>
-                                <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-slate-950 flex items-center justify-center shadow-inner text-sm sm:text-base">
-                                    ${icon}
-                                </div>
-                            </div>
+            allElements.forEach(el => {
+                const lCount = reactantCounts[el] || 0;
+                const rCount = productCounts[el] || 0;
+                const isMatch = lCount === rCount;
+
+                // Visual styling logic
+                const lWidth = Math.max(10, (lCount / maxCount) * 100) + '%';
+                const rWidth = Math.max(10, (rCount / maxCount) * 100) + '%';
+                
+                const boxStyle = isMatch ? 'bg-slate-800/80 border-slate-600/50' : 'bg-rose-950/30 border-rose-900/50';
+                const iconHtml = isMatch 
+                    ? `<div class="w-10 h-10 shrink-0 rounded-full bg-chem-neon-green/20 text-chem-neon-green flex items-center justify-center text-lg shadow-[0_0_15px_rgba(52,211,153,0.3)] z-10 border border-chem-neon-green/30"><i class="fa-solid fa-check"></i></div>` 
+                    : `<div class="w-10 h-10 shrink-0 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center text-lg shadow-[0_0_15px_rgba(244,63,94,0.3)] z-10 border border-rose-500/30 animate-pulse"><i class="fa-solid fa-not-equal"></i></div>`;
+
+                html += `
+                    <div class="grid grid-cols-[1fr_minmax(120px,auto)_1fr] items-center gap-2 sm:gap-4 px-2 sm:px-4 py-3 rounded-2xl border ${boxStyle} transition-all relative overflow-hidden min-h-[60px]">
+                        
+                        <!-- Left (Reactant) -->
+                        <div class="flex items-center justify-start h-full relative pl-2 w-full">
+                            <div class="absolute inset-y-0 right-0 bg-chem-neon-purple/20 rounded-l-xl balance-bar" style="width: ${lWidth};"></div>
+                            <span class="font-mono font-black text-2xl sm:text-3xl text-chem-neon-purple relative z-10 drop-shadow-md ml-auto pr-2 sm:pr-4">${lCount}</span>
                         </div>
-                    `;
-                }
-                return html;
-            };
 
-            document.getElementById('reactant-atoms-visual').innerHTML = generateListHtml(reactantCounts, productCounts, 'indigo');
-            document.getElementById('product-atoms-visual').innerHTML = generateListHtml(productCounts, reactantCounts, 'emerald');
+                        <!-- Center (Element Symbol & Status) -->
+                        <div class="flex items-center justify-center gap-2 sm:gap-4 px-2 relative z-10">
+                            ${iconHtml}
+                            <span class="font-black text-2xl sm:text-3xl lg:text-4xl text-white w-10 sm:w-12 text-center drop-shadow-lg shrink-0">${el}</span>
+                        </div>
+
+                        <!-- Right (Product) -->
+                        <div class="flex items-center justify-end h-full relative pr-2 w-full">
+                            <div class="absolute inset-y-0 left-0 bg-chem-neon-green/20 rounded-r-xl balance-bar" style="width: ${rWidth};"></div>
+                            <span class="font-mono font-black text-2xl sm:text-3xl text-chem-neon-green relative z-10 drop-shadow-md mr-auto pl-2 sm:pl-4">${rCount}</span>
+                        </div>
+                        
+                    </div>
+                `;
+            });
+
+            document.getElementById('unified-atom-visual').innerHTML = html;
         }
 
         function checkEquationBalance() {
@@ -409,10 +486,7 @@
             let isCorrect = true;
             const correct = eq.correctCoeffs;
             
-            // Check if ratio matches exactly (simplest whole number ratio)
-            // Note: Since correctCoeffs are already lowest terms, we check if userCoeffs == correctCoeffs
-            // OR if userCoeffs is a direct multiple (though usually we want simplest form).
-            // Let's enforce simplest form for strict correctness.
+            // Check for exact match (simplest ratio)
             for (let i = 0; i < correct.length; i++) {
                 if (userCoeffs[i] !== correct[i]) {
                     isCorrect = false;
@@ -422,12 +496,12 @@
 
             if (isCorrect) {
                 confetti({
-                    particleCount: 150,
-                    spread: 100,
-                    origin: { y: 0.6 },
-                    colors: ['#2dd4bf', '#3b82f6', '#fcd34d']
+                    particleCount: 200,
+                    spread: 120,
+                    origin: { y: 0.5 },
+                    colors: ['#38BDF8', '#34D399', '#A78BFA', '#FFFFFF']
                 });
-                alertModal("สมดุลสมบูรณ์แบบ!", "จำนวนอะตอมเท่ากันและอยู่ในอัตราส่วนอย่างต่ำ เก่งมาก!", "success");
+                alertModal("สมบูรณ์แบบ! 🎉", "จำนวนอะตอมเท่ากันและอยู่ในอัตราส่วนอย่างต่ำ เก่งมาก!", "success");
             } else {
                 // Check if they are balanced but not lowest ratio
                 let isBalancedNotLowest = true;
@@ -440,9 +514,9 @@
                 }
                 
                 if(isBalancedNotLowest) {
-                     alertModal("เกือบถูกแล้ว!", "สมการสมดุลแล้ว แต่ตัวเลขยังไม่ใช่ <b>อัตราส่วนอย่างต่ำ</b> ลองหารทอนดูนะ", "warning");
+                     alertModal("เกือบถูกแล้ว 💡", "สมการสมดุลแล้ว! แต่ตัวเลขยังไม่ใช่ <b>อัตราส่วนอย่างต่ำ</b> ลองนำตัวเลขมาหารทอนดูนะ", "warning");
                 } else {
-                     alertModal("ยังไม่สมดุล", "จำนวนอะตอมยังไม่เท่ากัน ลองปรับสัมประสิทธิ์อีกนิด", "error");
+                     alertModal("ยังไม่สมดุล ⚠️", "จำนวนอะตอมซ้ายและขวายังไม่เท่ากัน ลองสังเกตธาตุที่มีไอคอนเตือนสีแดง แล้วปรับตัวเลขใหม่", "error");
                 }
             }
         }
@@ -452,25 +526,25 @@
             if (existing) existing.remove();
 
             let colorConfig = {
-                success: { border: 'border-emerald-500', bg: 'bg-emerald-500/20', text: 'text-emerald-400', icon: 'fa-check', btn: 'bg-emerald-500 hover:bg-emerald-400 text-slate-950' },
-                error: { border: 'border-rose-500', bg: 'bg-rose-500/20', text: 'text-rose-400', icon: 'fa-xmark', btn: 'bg-rose-500 hover:bg-rose-400 text-white' },
-                warning: { border: 'border-amber-500', bg: 'bg-amber-500/20', text: 'text-amber-400', icon: 'fa-exclamation', btn: 'bg-amber-500 hover:bg-amber-400 text-slate-950' }
+                success: { border: 'border-chem-neon-green/50', bg: 'bg-emerald-950/90', text: 'text-chem-neon-green', icon: 'fa-wand-magic-sparkles', btn: 'bg-gradient-to-r from-emerald-500 to-green-500 text-slate-950 shadow-emerald-500/30' },
+                error: { border: 'border-rose-500/50', bg: 'bg-rose-950/90', text: 'text-rose-400', icon: 'fa-triangle-exclamation', btn: 'bg-gradient-to-r from-rose-500 to-red-600 text-white shadow-rose-500/30' },
+                warning: { border: 'border-amber-500/50', bg: 'bg-amber-950/90', text: 'text-amber-400', icon: 'fa-scale-unbalanced', btn: 'bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 shadow-amber-500/30' }
             };
             const c = colorConfig[type];
 
             const box = document.createElement('div');
             box.id = 'custom-alert-box';
-            box.className = 'fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4';
+            box.className = 'fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4';
             box.innerHTML = `
-                <div class="bg-chem-panel border ${c.border} rounded-3xl max-w-sm w-full p-8 shadow-2xl text-center transform scale-100 animate-[pulse_0.2s_ease-out]">
-                    <div class="w-20 h-20 mx-auto rounded-full ${c.bg} ${c.text} flex items-center justify-center text-4xl font-black mb-4 shadow-inner">
+                <div class="bg-chem-panel border-2 ${c.border} rounded-[2rem] max-w-sm w-full p-8 shadow-2xl text-center transform scale-100 animate-pop">
+                    <div class="w-24 h-24 mx-auto rounded-3xl ${c.bg} ${c.text} border border-white/10 flex items-center justify-center text-5xl font-black mb-6 shadow-inner">
                         <i class="fa-solid ${c.icon}"></i>
                     </div>
-                    <div class="space-y-2 mb-6">
-                        <h3 class="text-2xl font-black text-white">${title}</h3>
-                        <p class="text-sm sm:text-base text-slate-300 leading-relaxed">${desc}</p>
+                    <div class="space-y-3 mb-8">
+                        <h3 class="text-3xl font-black text-white tracking-tight">${title}</h3>
+                        <p class="text-base text-slate-300 leading-relaxed">${desc}</p>
                     </div>
-                    <button onclick="document.getElementById('custom-alert-box').remove()" class="w-full py-4 rounded-2xl ${c.btn} font-black text-lg transition-all shadow-lg">
+                    <button onclick="document.getElementById('custom-alert-box').remove()" class="w-full py-4 rounded-2xl ${c.btn} font-black text-xl transition-all shadow-[0_0_20px_rgba(0,0,0,0.5)] transform hover:scale-105 active:scale-95">
                         ตกลง
                     </button>
                 </div>
