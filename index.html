@@ -69,24 +69,23 @@
             margin: 0; 
         }
         
-        /* 16:9 App Container constraints */
+        /* Responsive App Container Constraints */
         #app-container {
             width: 100%;
             height: 100%;
+            max-width: 1920px;
+            margin: 0 auto;
             display: flex;
             flex-direction: column;
-            background: transparent;
+            background: rgba(15, 23, 42, 0.2);
             position: relative;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
         }
 
-        @media (min-aspect-ratio: 16/9) {
+        @media (min-width: 768px) {
             #app-container {
-                width: calc(100vh * (16 / 9));
-                margin: 0 auto;
                 border-left: 1px solid rgba(51, 65, 85, 0.5);
                 border-right: 1px solid rgba(51, 65, 85, 0.5);
-                box-shadow: 0 0 50px rgba(0,0,0,0.5);
-                background: rgba(15, 23, 42, 0.4);
             }
         }
 
@@ -187,7 +186,7 @@
             <div class="flex-1 flex flex-col min-h-0 glass-card rounded-[2rem] shadow-2xl overflow-hidden relative border border-slate-700/60 ring-1 ring-black/20">
                 
                 <!-- 1. The Equation Builder (Top Half) -->
-                <div id="equation-builder-container" class="flex-none flex flex-row items-center justify-start md:justify-center gap-3 sm:gap-6 p-6 sm:p-10 overflow-x-auto no-scrollbar w-full min-h-[45%] bg-gradient-to-b from-transparent to-slate-900/50 relative z-10">
+                <div id="equation-builder-container" class="flex-none flex flex-row items-center justify-start lg:justify-center gap-3 sm:gap-6 p-4 sm:p-10 overflow-x-auto no-scrollbar w-full min-h-[35%] sm:min-h-[45%] bg-gradient-to-b from-transparent to-slate-900/50 relative z-10">
                     <!-- Dynamic Equation Elements go here -->
                 </div>
 
@@ -339,7 +338,7 @@
             const buildTerm = (r, idx, isProduct) => {
                 let termHtml = '';
                 if (idx > 0) {
-                    termHtml += '<span class="text-4xl sm:text-5xl font-black text-slate-500 mx-2 sm:mx-4 shrink-0 drop-shadow-md">+</span>';
+                    termHtml += '<span class="text-3xl sm:text-5xl font-black text-slate-500 mx-1.5 sm:mx-4 shrink-0 drop-shadow-md">+</span>';
                 }
                 
                 // Dark theme visual definitions
@@ -351,26 +350,26 @@
                 const shadowGlow = isProduct ? 'hover:shadow-[0_0_20px_rgba(52,211,153,0.15)]' : 'hover:shadow-[0_0_20px_rgba(129,140,248,0.15)]';
                 
                 termHtml += `
-                    <div class="flex flex-row items-stretch ${bgTheme} border-2 ${borderTheme} rounded-3xl shrink-0 overflow-hidden relative group transition-all duration-300 ${activeBorder} ${shadowGlow} backdrop-blur-sm">
+                    <div class="flex flex-row items-stretch ${bgTheme} border-2 ${borderTheme} rounded-2xl sm:rounded-3xl shrink-0 overflow-hidden relative group transition-all duration-300 ${activeBorder} ${shadowGlow} backdrop-blur-sm">
                         
                         <!-- Stacked Vertical Controls (Left Side) - LARGER ARROWS -->
-                        <div class="flex flex-col border-r-2 ${borderTheme} bg-slate-900/80 w-20 sm:w-24 lg:w-28 z-10">
+                        <div class="flex flex-col border-r-2 ${borderTheme} bg-slate-900/80 w-16 sm:w-24 lg:w-28 z-10">
                             <!-- Larger Up Arrow -->
-                            <button onclick="adjustCoeff(${coeffIdx}, 1)" class="flex-1 flex items-center justify-center ${btnBg} transition-all cursor-pointer py-3 group/btn">
-                                <i class="fa-solid fa-chevron-up text-3xl sm:text-4xl transition-transform group-hover/btn:-translate-y-1"></i>
+                            <button onclick="adjustCoeff(${coeffIdx}, 1)" class="flex-1 flex items-center justify-center ${btnBg} transition-all cursor-pointer py-2 sm:py-3 group/btn">
+                                <i class="fa-solid fa-chevron-up text-xl sm:text-4xl transition-transform group-hover/btn:-translate-y-1"></i>
                             </button>
                             
-                            <input type="number" min="1" max="15" value="1" id="coeff-input-${coeffIdx}" data-coeff="${coeffIdx}" onchange="updateSimulatorVisuals()" class="w-full text-center py-2 sm:py-3 bg-slate-950/80 ${textTheme} font-black text-3xl sm:text-4xl lg:text-5xl outline-none focus:bg-slate-900 border-y ${borderTheme} transition-all neon-glow drop-shadow-md">
+                            <input type="number" min="1" max="15" value="1" id="coeff-input-${coeffIdx}" data-coeff="${coeffIdx}" onchange="updateSimulatorVisuals()" class="w-full text-center py-1 sm:py-3 bg-slate-950/80 ${textTheme} font-black text-2xl sm:text-4xl lg:text-5xl outline-none focus:bg-slate-900 border-y ${borderTheme} transition-all neon-glow drop-shadow-md">
                             
                             <!-- Larger Down Arrow -->
-                            <button onclick="adjustCoeff(${coeffIdx}, -1)" class="flex-1 flex items-center justify-center ${btnBg} transition-all cursor-pointer py-3 group/btn">
-                                <i class="fa-solid fa-chevron-down text-3xl sm:text-4xl transition-transform group-hover/btn:translate-y-1"></i>
+                            <button onclick="adjustCoeff(${coeffIdx}, -1)" class="flex-1 flex items-center justify-center ${btnBg} transition-all cursor-pointer py-2 sm:py-3 group/btn">
+                                <i class="fa-solid fa-chevron-down text-xl sm:text-4xl transition-transform group-hover/btn:translate-y-1"></i>
                             </button>
                         </div>
 
                         <!-- Formula Display (Right Side) -->
-                        <div class="px-6 sm:px-10 lg:px-12 py-6 sm:py-8 flex items-center justify-center z-10 bg-gradient-to-r from-transparent to-black/10">
-                            <span class="font-mono text-5xl sm:text-6xl lg:text-7xl font-black text-white tracking-widest drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">${r.formula}</span>
+                        <div class="px-4 sm:px-10 lg:px-12 py-4 sm:py-8 flex items-center justify-center z-10 bg-gradient-to-r from-transparent to-black/10">
+                            <span class="font-mono text-4xl sm:text-6xl lg:text-7xl font-black text-white tracking-widest drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">${r.formula}</span>
                         </div>
                     </div>
                 `;
@@ -384,7 +383,7 @@
             });
 
             // Arrow
-            html += '<div class="mx-4 sm:mx-8 text-cyan-400 text-5xl sm:text-7xl font-black shrink-0 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]"><i class="fa-solid fa-arrow-right-long"></i></div>';
+            html += '<div class="mx-2 sm:mx-8 text-cyan-400 text-4xl sm:text-7xl font-black shrink-0 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]"><i class="fa-solid fa-arrow-right-long"></i></div>';
 
             // Build Products
             eq.products.forEach((p, idx) => {
@@ -467,28 +466,28 @@
                 const boxStyle = isMatch ? 'bg-slate-800/60 border-slate-700/50 hover:bg-slate-800/80' : 'bg-rose-950/20 border-rose-900/50 hover:bg-rose-950/40';
                 
                 const iconHtml = isMatch 
-                    ? `<div class="w-12 h-12 shrink-0 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl z-10 border border-emerald-500/30 shadow-[0_0_15px_rgba(52,211,153,0.2)]"><i class="fa-solid fa-check"></i></div>` 
-                    : `<div class="w-12 h-12 shrink-0 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center text-xl z-10 border border-rose-500/30 shadow-[0_0_15px_rgba(244,63,94,0.3)] animate-pulse"><i class="fa-solid fa-not-equal"></i></div>`;
+                    ? `<div class="w-8 h-8 sm:w-12 sm:h-12 shrink-0 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm sm:text-xl z-10 border border-emerald-500/30 shadow-[0_0_15px_rgba(52,211,153,0.2)]"><i class="fa-solid fa-check"></i></div>` 
+                    : `<div class="w-8 h-8 sm:w-12 sm:h-12 shrink-0 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center text-sm sm:text-xl z-10 border border-rose-500/30 shadow-[0_0_15px_rgba(244,63,94,0.3)] animate-pulse"><i class="fa-solid fa-not-equal"></i></div>`;
 
                 html += `
-                    <div class="grid grid-cols-[1fr_minmax(120px,auto)_1fr] items-center gap-2 sm:gap-4 px-2 sm:px-4 py-3 sm:py-4 rounded-2xl border ${boxStyle} transition-all duration-300 relative overflow-hidden min-h-[70px] backdrop-blur-sm group">
+                    <div class="grid grid-cols-[1fr_auto_1fr] sm:grid-cols-[1fr_minmax(120px,auto)_1fr] items-center gap-1 sm:gap-4 px-2 sm:px-4 py-2 sm:py-4 rounded-xl sm:rounded-2xl border ${boxStyle} transition-all duration-300 relative overflow-hidden min-h-[60px] sm:min-h-[70px] backdrop-blur-sm group">
                         
                         <!-- Left (Reactant) -->
                         <div class="flex items-center justify-start h-full relative pl-2 w-full">
                             <div class="absolute inset-y-1 right-0 bg-gradient-to-l from-indigo-500/80 to-indigo-600/40 rounded-l-xl balance-bar border-y border-l border-indigo-400/50 shadow-[0_0_12px_rgba(99,102,241,0.4)]" style="width: ${lWidth};"></div>
-                            <span class="font-mono font-black text-3xl sm:text-4xl text-white drop-shadow-md relative z-10 ml-auto pr-3 sm:pr-5">${lCount}</span>
+                            <span class="font-mono font-black text-2xl sm:text-4xl text-white drop-shadow-md relative z-10 ml-auto pr-2 sm:pr-5">${lCount}</span>
                         </div>
 
                         <!-- Center (Element Symbol & Status) -->
-                        <div class="flex items-center justify-center gap-3 sm:gap-5 px-2 relative z-10 shrink-0">
+                        <div class="flex items-center justify-center gap-2 sm:gap-5 px-1 sm:px-2 relative z-10 shrink-0">
                             ${iconHtml}
-                            <span class="font-black text-3xl sm:text-4xl lg:text-5xl text-white w-12 sm:w-16 text-center shrink-0 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">${el}</span>
+                            <span class="font-black text-2xl sm:text-4xl lg:text-5xl text-white w-8 sm:w-16 text-center shrink-0 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">${el}</span>
                         </div>
 
                         <!-- Right (Product) -->
                         <div class="flex items-center justify-end h-full relative pr-2 w-full">
                             <div class="absolute inset-y-1 left-0 bg-gradient-to-r from-emerald-500/80 to-emerald-600/40 rounded-r-xl balance-bar border-y border-r border-emerald-400/50 shadow-[0_0_12px_rgba(52,211,153,0.4)]" style="width: ${rWidth};"></div>
-                            <span class="font-mono font-black text-3xl sm:text-4xl text-white drop-shadow-md relative z-10 mr-auto pl-3 sm:pl-5">${rCount}</span>
+                            <span class="font-mono font-black text-2xl sm:text-4xl text-white drop-shadow-md relative z-10 mr-auto pl-2 sm:pl-5">${rCount}</span>
                         </div>
                         
                     </div>
